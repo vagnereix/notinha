@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:notinha_do_role/models/note.dart';
 import 'package:notinha_do_role/repositories/notes_repository.dart';
 import 'package:provider/provider.dart';
@@ -14,12 +15,17 @@ class AddNotePage extends StatefulWidget {
 }
 
 class _AddNotePageState extends State<AddNotePage> {
-  final noteAmountController = TextEditingController();
-  final descriptionController = TextEditingController();
-  final peopleAmountController = TextEditingController();
+  final _noteAmountController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _peopleAmountController = TextEditingController();
 
-  final formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   int? _type;
+
+  final _formatter = NumberFormat.simpleCurrency(
+    locale: 'pt_BR',
+    decimalDigits: 2,
+  );
 
   late final NotesRepository _notesRepository;
 
@@ -32,11 +38,16 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   void _createAndSaveNote() {
+    debugPrint('Valor na fun:::: ${_noteAmountController.text}');
+    debugPrint(
+      'Valor convertido na fun:::: ${_formatter.parse(_noteAmountController.text) as double}',
+    );
+
     final newNote = Note(
-      amount: double.parse(noteAmountController.value.text),
-      peopleAmount: int.parse(peopleAmountController.value.text),
+      amount: _formatter.parse(_noteAmountController.text) as double,
+      peopleAmount: int.parse(_peopleAmountController.text),
       type: _type as int,
-      description: descriptionController.value.text,
+      description: _descriptionController.value.text,
       date: DateTime.now(),
     );
 
@@ -79,11 +90,9 @@ class _AddNotePageState extends State<AddNotePage> {
   @override
   void dispose() {
     super.dispose();
-    noteAmountController.dispose();
-    descriptionController.dispose();
-    peopleAmountController.dispose();
-
-    ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+    _noteAmountController.dispose();
+    _descriptionController.dispose();
+    _peopleAmountController.dispose();
   }
 
   @override
@@ -93,7 +102,7 @@ class _AddNotePageState extends State<AddNotePage> {
         child: Padding(
           padding: const EdgeInsets.all(25),
           child: Form(
-            key: formKey,
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -115,30 +124,28 @@ class _AddNotePageState extends State<AddNotePage> {
 
                     return null;
                   },
-                  controller: descriptionController,
+                  controller: _descriptionController,
                   label: 'Como você descreveria este rolê?',
                 ),
                 const SizedBox(
                   height: 16,
                 ),
                 TextFormFieldWidget(
+                  isCurrency: true,
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Por favor, preencha este campo';
                     }
 
-                    if (double.tryParse(value) == null) {
-                      return 'O valor informado é inválido';
-                    }
-
-                    if (double.tryParse(value) == 0) {
+                    debugPrint('Valor na validação: $value');
+                    if (_formatter.parse(value) as double == 0) {
                       return 'Este valor não pode ser zero';
                     }
 
                     return null;
                   },
-                  controller: noteAmountController,
+                  controller: _noteAmountController,
                   label: 'Qual o valor total da nota?',
                 ),
                 const SizedBox(
@@ -161,7 +168,7 @@ class _AddNotePageState extends State<AddNotePage> {
 
                     return null;
                   },
-                  controller: peopleAmountController,
+                  controller: _peopleAmountController,
                   label: 'Qual o total de pessoas pagantes?',
                 ),
                 const SizedBox(
@@ -218,7 +225,7 @@ class _AddNotePageState extends State<AddNotePage> {
                       ),
                       onPressed: () {
                         final isFormValid =
-                            formKey.currentState?.validate() ?? false;
+                            _formKey.currentState?.validate() ?? false;
 
                         if (isFormValid) {
                           _createAndSaveNote();
