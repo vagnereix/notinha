@@ -34,6 +34,7 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
         label: Text(widget.label),
       ),
       onTapOutside: (event) => FocusScope.of(context).unfocus(),
+      onEditingComplete: () => FocusScope.of(context).nextFocus(),
       inputFormatters: widget.isCurrency
           ? [
               CurrencyTextInputFormatter(

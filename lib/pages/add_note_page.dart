@@ -18,9 +18,9 @@ class _AddNotePageState extends State<AddNotePage> {
   final _noteAmountController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _peopleAmountController = TextEditingController();
+  int? _typeNote;
 
   final _formKey = GlobalKey<FormState>();
-  int? _type;
 
   final _formatter = NumberFormat.simpleCurrency(
     locale: 'pt_BR',
@@ -38,15 +38,10 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   void _createAndSaveNote() {
-    debugPrint('Valor na fun:::: ${_noteAmountController.text}');
-    debugPrint(
-      'Valor convertido na fun:::: ${_formatter.parse(_noteAmountController.text) as double}',
-    );
-
     final newNote = Note(
       amount: _formatter.parse(_noteAmountController.text) as double,
       peopleAmount: int.parse(_peopleAmountController.text),
-      type: _type as int,
+      type: _typeNote as int,
       description: _descriptionController.value.text,
       date: DateTime.now(),
     );
@@ -138,7 +133,6 @@ class _AddNotePageState extends State<AddNotePage> {
                       return 'Por favor, preencha este campo';
                     }
 
-                    debugPrint('Valor na validação: $value');
                     if (_formatter.parse(value) as double == 0) {
                       return 'Este valor não pode ser zero';
                     }
@@ -200,7 +194,7 @@ class _AddNotePageState extends State<AddNotePage> {
                       child: Text('Cotinha'),
                     ),
                   ],
-                  onChanged: (value) => _type = value as int,
+                  onChanged: (value) => _typeNote = value as int,
                   decoration: const InputDecoration(
                     isDense: true,
                     label: Text('Selecione o tipo desta nota'),
