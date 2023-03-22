@@ -37,6 +37,9 @@ class _AddNotePageState extends State<AddNotePage> {
     });
   }
 
+  ScaffoldFeatureController<MaterialBanner, MaterialBannerClosedReason>?
+      _scaffoldMessengerController;
+
   void _createAndSaveNote() {
     final newNote = Note(
       amount: _formatter.parse(_noteAmountController.text) as double,
@@ -50,7 +53,8 @@ class _AddNotePageState extends State<AddNotePage> {
     _notesRepository.addNote(newNote);
 
     ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-    ScaffoldMessenger.of(context).showMaterialBanner(
+    _scaffoldMessengerController =
+        ScaffoldMessenger.of(context).showMaterialBanner(
       MaterialBanner(
         content: RichText(
           text: TextSpan(
@@ -88,6 +92,7 @@ class _AddNotePageState extends State<AddNotePage> {
     _noteAmountController.dispose();
     _descriptionController.dispose();
     _peopleAmountController.dispose();
+    _scaffoldMessengerController?.close();
   }
 
   @override
